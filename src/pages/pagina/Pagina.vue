@@ -9,6 +9,7 @@
         <grid-vue tamanho="8">
           <span class="black-text">
             <h5>{{ dono_pagina.name }}</h5>
+            <button v-if="dono_pagina.id != usuario.id" class="btn" @click="amigo(dono_pagina.id)" style="cursor: pointer;">Seguir</button>
           </span>
         </grid-vue>
       </div>
@@ -52,7 +53,8 @@ export default {
       pararScroll: false,
       dono_pagina: {
         imagem: '',
-        name  : ''
+        name  : '',
+        id    : '',
       },
     }
   },
@@ -83,6 +85,7 @@ export default {
               this.nextPage = response.data.conteudos.next_page_url;
               this.dono_pagina.imagem = response.data.dono_pagina.imagem;
               this.dono_pagina.name = response.data.dono_pagina.name;
+              this.dono_pagina.id = response.data.dono_pagina.id;
             }
           })
           .catch(e => {
@@ -123,6 +126,23 @@ export default {
         this.pararScroll = true;
         this.carregaPaginacao();
       }
+    },
+    amigo(id)
+    {
+      axios.post(this.$urlAPI + "/usuario/seguir", {id: id}, {"headers": {"Authorization": "Bearer " + this.$store.getters.getToken}})
+           .then(response => {
+            if(response.data.status)
+            {
+              console.log(response.data);
+            }else
+            {
+              console.log(response.data.error);
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            alert('Erro! Tente novamente mais tarde!');
+          })
     }
   },
   computed: {

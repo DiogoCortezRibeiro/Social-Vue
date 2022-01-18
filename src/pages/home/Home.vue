@@ -127,7 +127,6 @@ export default {
   computed: {
     listarConteudos()
     {
-      console.log(this.$store.getters.getConteudosLinhaTempo)
       return this.$store.getters.getConteudosLinhaTempo;
     }
   }
