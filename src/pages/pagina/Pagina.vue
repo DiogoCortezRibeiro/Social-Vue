@@ -9,7 +9,7 @@
         <grid-vue tamanho="8">
           <span class="black-text">
             <h5>{{ dono_pagina.name }}</h5>
-            <button v-if="dono_pagina.id != usuario.id" class="btn" @click="amigo(dono_pagina.id)" style="cursor: pointer;">Seguir</button>
+            <button v-if="dono_pagina.id != usuario.id" class="btn" :class="getClasseSeguir" @click="amigo(dono_pagina.id)" style="cursor: pointer;">{{ textoBotao }}</button>
           </span>
         </grid-vue>
       </div>
@@ -17,7 +17,9 @@
 
     <span slot="amigos">
       <h3>Seguindo</h3>
-      <li v-for="amigo in amigos" :key="amigo.id">{{ amigo.name }}</li>
+      <router-link v-for="amigo in amigos" :key="amigo.id" :to="'/pagina/' + amigo.id+'/'+$slug(amigo.name, {lower: true})">
+        <li style="color: black;">{{ amigo.name }}</li>
+      </router-link>
     </span>
 
     <span slot="principal">
@@ -57,6 +59,8 @@ export default {
       nextPage   : null,
       pararScroll: false,
       amigos     : [],
+      amigosLogado: [],
+      textoBotao  : 'Seguir',
       dono_pagina: {
         imagem: '',
         name  : '',
@@ -72,6 +76,9 @@ export default {
       this.usuario = usuario;
       this.listaConteudos();
     }
+  },
+  watch: {
+    '$route': 'listaConteudos'
   },
   components:{
     CardConteudoVue,
@@ -108,12 +115,27 @@ export default {
             if(response.data.status)
             {
               this.amigos = response.data.amigos;
+              this.amigosLogado = response.data.amigos_logado;
+              this.ehAmigo();
             }
           })
           .catch(e => {
             console.log(e);
             alert('Erro! Tente novamente mais tarde!');
           })
+    },
+    ehAmigo()
+    {
+      for(let amigo of this.amigosLogado)
+      {
+        if(amigo.id == this.dono_pagina.id)
+        {
+          this.textoBotao = 'Deixa de Seguir';
+          return;
+        }
+      }
+
+      this.textoBotao = 'Seguir';
     },
     carregaPaginacao()
     {
@@ -155,7 +177,8 @@ export default {
            .then(response => {
             if(response.data.status)
             {
-              console.log(response.data);
+              this.amigosLogado = response.data.amigos;
+              this.ehAmigo();
             }else
             {
               console.log(response.data.error);
@@ -165,12 +188,16 @@ export default {
             console.log(e);
             alert('Erro! Tente novamente mais tarde!');
           })
-    }
+    },
   },
   computed: {
     listarConteudos()
     {
       return this.$store.getters.getConteudosLinhaTempo;
+    },
+    getClasseSeguir()
+    {
+      return this.textoBotao == 'Seguir' ? '' : 'orange';
     }
   }
 }

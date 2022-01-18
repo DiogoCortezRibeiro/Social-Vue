@@ -20,7 +20,10 @@
 
     <span slot="amigos">
       <h3>Seguindo</h3>
-      <li v-for="amigo in amigos" :key="amigo.id">{{ amigo.name }}</li>
+      <router-link v-for="amigo in amigos" :key="amigo.id" :to="'/pagina/' + amigo.id">
+        <li  style="color: black;" >{{ amigo.name }}</li>
+      </router-link>
+      
     </span>
 
     <span slot="principal">
