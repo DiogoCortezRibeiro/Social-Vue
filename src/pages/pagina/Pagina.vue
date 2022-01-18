@@ -15,6 +15,11 @@
       </div>
     </span>
 
+    <span slot="amigos">
+      <h3>Seguindo</h3>
+      <li v-for="amigo in amigos" :key="amigo.id">{{ amigo.name }}</li>
+    </span>
+
     <span slot="principal">
       <publicar-conteudo-vue/>
       <card-conteudo-vue v-for="item in listarConteudos" :key="item.id"
@@ -51,6 +56,7 @@ export default {
       usuario    : false,
       nextPage   : null,
       pararScroll: false,
+      amigos     : [],
       dono_pagina: {
         imagem: '',
         name  : '',
@@ -86,6 +92,22 @@ export default {
               this.dono_pagina.imagem = response.data.dono_pagina.imagem;
               this.dono_pagina.name = response.data.dono_pagina.name;
               this.dono_pagina.id = response.data.dono_pagina.id;
+              
+              this.listaAmigosPagina();
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            alert('Erro! Tente novamente mais tarde!');
+          })
+    },
+    listaAmigosPagina()
+    {
+      axios.get(this.$urlAPI + '/usuario/lista_amigos_pagina/' + this.dono_pagina.id, {"headers": {"Authorization": "Bearer " + this.$store.getters.getToken}})
+           .then(response => {
+            if(response.data.status)
+            {
+              this.amigos = response.data.amigos;
             }
           })
           .catch(e => {

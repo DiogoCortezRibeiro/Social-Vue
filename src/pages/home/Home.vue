@@ -18,6 +18,11 @@
       </div>
     </span>
 
+    <span slot="amigos">
+      <h3>Seguindo</h3>
+      <li v-for="amigo in amigos" :key="amigo.id">{{ amigo.name }}</li>
+    </span>
+
     <span slot="principal">
       <publicar-conteudo-vue/>
       <card-conteudo-vue v-for="item in listarConteudos" :key="item.id"
@@ -55,6 +60,7 @@ export default {
       usuario    : false,
       nextPage   : null,
       pararScroll: false,
+      amigos     : [],
     }
   },
   created()
@@ -64,6 +70,7 @@ export default {
     {
       this.usuario = usuario;
       this.listaConteudos();
+      this.listaAmigos();
     }
   },
   components:{
@@ -82,6 +89,20 @@ export default {
             {
               this.$store.commit('setConteudosLinhaTempo', response.data.conteudos.data);
               this.nextPage = response.data.conteudos.next_page_url;
+            }
+          })
+          .catch(e => {
+            console.log(e);
+            alert('Erro! Tente novamente mais tarde!');
+          })
+    },
+    listaAmigos()
+    {
+      axios.get(this.$urlAPI + '/usuario/lista_amigos', {"headers": {"Authorization": "Bearer " + this.$store.getters.getToken}})
+           .then(response => {
+            if(response.data.status)
+            {
+              this.amigos = response.data.amigos;
             }
           })
           .catch(e => {
